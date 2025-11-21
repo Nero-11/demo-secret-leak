@@ -1,0 +1,17 @@
+name: Demo leak secret compromis
+on: [push]
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      # Étape normale
+      - name: Affichage légitime
+        run: |
+          echo "----- Début du log légitime -----"
+          echo "La valeur du secret est : $DEMO_SECRET"
+          echo "----- Fin du log légitime -----"
+env:
+          DEMO_SECRET: ${{ secrets.DEMO_SECRET1 }}
+     
